@@ -1,0 +1,134 @@
+import com.example.weather.buildsrc.Libs
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.example.weather"
+        minSdk 21
+        targetSdk 31
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [
+                        "room.incremental"          : "true",
+                        "room.expandProjection"     : "true",
+                        "room.schemaLocation"       : "$projectDir/schemas".toString(),
+                        "dagger.gradle.incremental" : "true"
+                ]
+            }
+        }
+    }
+
+    flavorDimensions "environment"
+
+    productFlavors {
+        dev {
+            dimension "environment"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-Dev"
+        }
+
+        prod {
+            dimension "environment"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        useIR = true
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerVersion Libs.Kotlin.version
+        kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+
+    kapt {
+        javacOptions {
+            // These options are normally set automatically via the Hilt Gradle plugin, but we
+            // set them manually to workaround a bug in the Kotlin 1.5.20
+            option("-Adagger.fastInit=ENABLED")
+            option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
+        }
+    }
+}
+
+dependencies {
+    implementation Libs.Kotlin.stdlib
+    implementation Libs.Coroutines.android
+
+    implementation Libs.AndroidX.appcompat
+    implementation Libs.AndroidX.coreKtx
+    implementation Libs.AndroidX.palette
+
+    implementation Libs.AndroidX.Activity.activityCompose
+
+    implementation Libs.AndroidX.Constraint.constraintLayoutCompose
+
+    implementation Libs.AndroidX.Compose.foundation
+    implementation Libs.AndroidX.Compose.material
+    implementation Libs.AndroidX.Compose.materialIconsExtended
+    implementation Libs.AndroidX.Compose.tooling
+    implementation Libs.AndroidX.Compose.hilt
+
+    implementation Libs.AndroidX.Lifecycle.runtime
+    implementation Libs.AndroidX.Lifecycle.viewmodel
+    implementation Libs.AndroidX.Lifecycle.viewModelCompose
+    implementation Libs.AndroidX.Navigation.navigation
+
+    implementation Libs.AndroidX.Window.window
+
+    implementation(Libs.Hilt.android)
+    kapt(Libs.Hilt.compiler)
+
+    implementation Libs.Accompanist.pager
+    implementation Libs.Accompanist.insets
+    implementation Libs.Accompanist.swipeRefresh
+    implementation Libs.Accompanist.systemUi
+
+    implementation Libs.Log.timber
+
+    implementation Libs.Coil.coilCompose
+
+//    implementation Libs.OkHttp.okhttp
+    implementation Libs.Retrofit.core
+    implementation Libs.Retrofit.converter
+    implementation Libs.OkHttp.logging
+
+    implementation Libs.AndroidX.Room.runtime
+    implementation Libs.AndroidX.Room.ktx
+
+    kapt Libs.AndroidX.Room.compiler
+}
