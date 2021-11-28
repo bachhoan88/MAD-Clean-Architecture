@@ -5,6 +5,7 @@ This is a sample app & basic code that uses Clean Architecture & Components, tha
 I have written about how to architect android application using the Uncle Bob's clean architecture approach.
 
 We use the `Compose` for design UI component
+
 Updating...
 
 ## License
