@@ -12,8 +12,11 @@ Introduction
 ### Data-Flow
 ![Structure](images/data-flow.jpg "Data flow")
 
-
 Updating...
+
+**Credit**
+
+### This app inspired from [Weather App Challenge] concept Designed by [Rajesh Kumar]
 
 ## License
 ```
@@ -31,3 +34,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+
+[Weather App Challenge]: https://www.uplabs.com/posts/weather-app-challenge-af378b48-496a-46aa-a180-5f71ebf3cf03
+[Rajesh Kumar]: https://www.uplabs.com/rcrajeshkumar    
