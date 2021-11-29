@@ -6,6 +6,13 @@ I have written about how to architect android application using the Uncle Bob's 
 
 We use the `Compose` for design UI component
 
+Introduction
+-------------
+
+### Data-Flow
+![Structure](images/data-flow.jpg "Data flow")
+
+
 Updating...
 
 ## License
