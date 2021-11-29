@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="base_url">https://api.openweathermap.org/data/2.5/</string>
-    <string name="app_id">19db43609e401fea86cc6f8d7e2bc8cd</string>
     <string name="com.crashlytics.android.build_id">RANDOM_UUID</string>
 </resources>
