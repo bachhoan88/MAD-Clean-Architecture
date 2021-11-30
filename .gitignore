@@ -16,3 +16,5 @@ buildSrc/build
 local.properties
 key.properties
 keystore
+app/dev/*
+app/prod/*
