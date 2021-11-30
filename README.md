@@ -20,6 +20,7 @@ I use the `Kotlin Flow` for data stream flow
 
 ### Error-Flow
 All `Exceptions` from `API`, `Local` or `Invalid UseCase` will mapper to `BaseException`
+
 ![Exception handler](images/error-flow.jpg "Error Flow")
 
 Updating...
