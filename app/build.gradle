@@ -7,10 +7,10 @@ plugins {
     id 'dagger.hilt.android.plugin'
 }
 
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def key = new Properties()
+def keyFile = rootProject.file('key.properties')
+if (keyFile.exists()) {
+    key.load(new FileInputStream(keyFile))
 }
 
 android {
@@ -58,12 +58,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            resValue "string", "app_id", keystoreProperties['app_id']
-        }
-
-        debug {
-            resValue "string", "app_id", keystoreProperties['app_id']
         }
     }
     compileOptions {

@@ -1,12 +1,17 @@
-# Jetpack Compose Clean Architecture Example
+# Weather app - Jetpack Compose Clean Architecture Example
+Weather app is an example for show current weather from World Cities, built with Jetpack Compose. 
+The goal of the sample is to showcase the current UI capabilities of Compose.
+Design pattern: Clean Architecture & MVVM 
+
 <img src="images/weather-app.png" alt="Jetpack Compose Samples" width="1024" />
 
-This is a sample app & basic code that uses Clean Architecture & Components, that is part of a blog post 
-I have written about how to architect android application using the Uncle Bob's clean architecture approach.
+## Features
+The example shows current weather from World Cities and other information such as:
+- Weather for the next 20 hours
+- Tomorrow's weather
+- Weather for the next 7 days
 
-We use the `Compose` for design UI component
-
-Introduction
+## Introduction
 -------------
 
 ### Data-Flow

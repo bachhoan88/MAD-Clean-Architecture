@@ -20,7 +20,7 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository {
 
     override fun getCurrentWeather(city: String): Flow<CurrentWeather> {
-        return weatherApi.getCurrentWeather(city = city, appId = context.getString(R.string.app_id))
+        return weatherApi.getCurrentWeather(city = city, appId = context.getString(R.string.weather_app_id))
             .map { weather ->
                 prefsHelper.saveLastCity(city)
                 weather
@@ -28,14 +28,14 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
     override fun getHourlyWeather(lat: Double, lon: Double): Flow<List<Hourly>> {
-        return weatherApi.getHourlyWeather(lat = lat, long = lon, appId = context.getString(R.string.app_id))
+        return weatherApi.getHourlyWeather(lat = lat, long = lon, appId = context.getString(R.string.weather_app_id))
             .map { response ->
                 response.hourly ?: emptyList()
             }
     }
 
     override fun getDailyWeather(lat: Double, lon: Double): Flow<List<Daily>> {
-        return weatherApi.getHourlyWeather(lat = lat, long = lon, appId = context.getString(R.string.app_id))
+        return weatherApi.getHourlyWeather(lat = lat, long = lon, appId = context.getString(R.string.weather_app_id))
             .map { response ->
                 response.daily ?: emptyList()
             }

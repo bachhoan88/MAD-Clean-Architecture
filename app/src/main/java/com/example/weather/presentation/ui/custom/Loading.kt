@@ -9,11 +9,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FullScreenLoading() {
+fun FullScreenLoading(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.Center)
+        modifier = modifier
+            .then(
+                Modifier
+                    .fillMaxSize()
+                    .wrapContentSize(Alignment.Center)
+            )
     ) {
         CircularProgressIndicator()
     }

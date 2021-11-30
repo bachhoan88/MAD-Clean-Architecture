@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,10 +46,13 @@ fun HomeScreen(
     navigateToNextSevenDay: (Float, Float) -> Unit
 ) {
     val viewState by viewModel.state.collectAsState()
+    val scaffoldState = rememberScaffoldState()
+
     HomeScreenContent(
         modifier = Modifier
             .statusBarsPadding()
             .navigationBarsPadding(),
+        scaffoldState = scaffoldState,
         homeViewState = viewState
     )
 }
@@ -57,6 +61,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     showTopAppBar: Boolean = true,
     modifier: Modifier,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     homeViewState: HomeViewState = HomeViewState()
 ) {
     val drawableId = if (isSystemInDarkTheme()) R.drawable.background_night else R.drawable.background
@@ -68,20 +73,27 @@ fun HomeScreenContent(
             alignment = Alignment.TopCenter
         ) {
             Scaffold(
+                scaffoldState = scaffoldState,
                 topBar = {
                     if (showTopAppBar) {
                         HomeTopAppBar()
                     }
                 },
                 modifier = modifier,
-                backgroundColor = MaterialTheme.colors.surface
+                backgroundColor = Color.Transparent
             ) {
                 val contentModifier = Modifier
                     .fillMaxSize()
                     .padding(all = 18.dp)
 
-                if (homeViewState.currentWeather != null) {
-                    CurrentWeatherContent(modifier = contentModifier, homeViewState.currentWeather, homeViewState.hourlyWeathers)
+
+                ExceptionHandleView(
+                    state = homeViewState,
+                    snackBarHostState = scaffoldState.snackbarHostState
+                ) {
+                    if (homeViewState.currentWeather != null) {
+                        CurrentWeatherContent(modifier = contentModifier, homeViewState.currentWeather, homeViewState.hourlyWeathers)
+                    }
                 }
             }
         }
@@ -225,7 +237,7 @@ fun CurrentWeatherInfo(
                     text = stringResource(R.string.humidity),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 12.sp
                     )
                 )
@@ -234,7 +246,7 @@ fun CurrentWeatherInfo(
                     text = currentWeather.humidity,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 24.sp
                     ),
                 )
@@ -267,7 +279,7 @@ fun CurrentWeatherInfo(
                     text = stringResource(R.string.wind),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 12.sp
                     )
                 )
@@ -276,7 +288,7 @@ fun CurrentWeatherInfo(
                     text = currentWeather.wind,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 24.sp
                     ),
                 )
@@ -309,7 +321,7 @@ fun CurrentWeatherInfo(
                     text = stringResource(R.string.visibility),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 12.sp
                     )
                 )
@@ -318,7 +330,7 @@ fun CurrentWeatherInfo(
                     text = currentWeather.visibility,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 24.sp
                     ),
                 )
@@ -351,7 +363,7 @@ fun CurrentWeatherInfo(
                     text = stringResource(R.string.real_feel),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 12.sp
                     )
                 )
@@ -360,7 +372,7 @@ fun CurrentWeatherInfo(
                     text = currentWeather.realFeel,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 24.sp
                     ),
                 )
@@ -414,7 +426,7 @@ private fun HomeTopAppBar(
                 )
             }
         },
-        backgroundColor = MaterialTheme.colors.surface,
+        backgroundColor = Color.Transparent,
         elevation = elevation
     )
 }

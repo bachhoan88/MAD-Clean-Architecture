@@ -14,12 +14,8 @@ private val LightThemeColors = lightColors(
     onPrimary = LightColor,
     secondary = Teal200,
     secondaryVariant = Red900,
-    onSecondary = Color.White,
     error = Red800,
-    onBackground = Background,
-    surface = Color.Transparent,
-    background = Background,
-    onSurface = Color.White
+    onSecondary = Color.Black
 )
 
 private val DarkThemeColors = darkColors(
@@ -27,12 +23,8 @@ private val DarkThemeColors = darkColors(
     primaryVariant = Purple700,
     onPrimary = DarkColor,
     secondary = Red300,
-    onSecondary = Color.Black,
     error = Red200,
-    onBackground = Background,
-    surface = Color.Transparent,
-    background = Background,
-    onSurface = Color.White
+    onSecondary = Color.White
 )
 
 

@@ -4,8 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -14,29 +14,106 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.weather.domain.exception.BaseException
 import com.example.weather.domain.model.Dialog
+import com.example.weather.domain.model.Redirect
+import com.example.weather.domain.model.Tag
 import com.example.weather.presentation.ui.custom.FullScreenLoading
 
 @Composable
 fun ExceptionHandleView(
+    modifier: Modifier = Modifier,
     state: ViewState,
     snackBarHostState: SnackbarHostState,
+    contentCleared: Boolean = false,
+    positiveAction: ((Int?, Any?) -> Unit)? = null,
+    negativeAction: ((Int?, Any?) -> Unit)? = null,
+    inlineActions: ((List<Tag>) -> Unit)? = null,
+    redirectAction: ((Redirect) -> Unit)? = null,
     content: @Composable (ViewState) -> Unit
 ) {
     when {
         state.isLoading -> FullScreenLoading()
-        state.exception != null -> when (state.exception) {
-            is BaseException.OnPageException -> ShowOnPageException(onPage = state.exception as BaseException.OnPageException)
-            is BaseException.AlertException -> ShowAlertDialog(dialog = state.exception as BaseException.AlertException)
-            is BaseException.ToastException -> ShowToast(toast = state.exception as BaseException.ToastException)
-            is BaseException.DialogException ->
-                ShowDialog(dialog = (state.exception as BaseException.DialogException).dialog)
-            is BaseException.SnackBarException ->
+        state.exception != null -> ShowError(
+            modifier = modifier,
+            state = state,
+            hostState = snackBarHostState,
+            contentCleared = contentCleared,
+            positiveAction = positiveAction,
+            negativeAction = negativeAction,
+            inlineActions = inlineActions,
+            redirectAction = redirectAction,
+            content = content
+        )
+        else -> content(state)
+    }
+}
+
+@Composable
+fun ShowError(
+    modifier: Modifier = Modifier,
+    state: ViewState,
+    hostState: SnackbarHostState,
+    contentCleared: Boolean = false,
+    positiveAction: ((Int?, Any?) -> Unit)? = null,
+    negativeAction: ((Int?, Any?) -> Unit)? = null,
+    inlineActions: ((List<Tag>) -> Unit)? = null,
+    redirectAction: ((Redirect) -> Unit)? = null,
+    content: @Composable (ViewState) -> Unit
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (!contentCleared) content(state)
+
+        when (state.exception) {
+            is BaseException.OnPageException ->
+                ShowOnPageException(onPage = state.exception as BaseException.OnPageException)
+
+            is BaseException.AlertException -> {
+                var showAlert by rememberSaveable { mutableStateOf(true) }
+                if (showAlert) {
+                    ShowAlertDialog(dialog = state.exception as BaseException.AlertException) {
+                        showAlert = false
+                    }
+                }
+                Spacer(modifier = Modifier)
+            }
+
+            is BaseException.ToastException -> {
+                ShowToast(toast = state.exception as BaseException.ToastException)
+                Spacer(modifier = Modifier)
+            }
+
+            is BaseException.DialogException -> {
+                var showDialog by rememberSaveable { mutableStateOf(true) }
+                if (showDialog) {
+                    ShowDialog(
+                        dialog = (state.exception as BaseException.DialogException).dialog,
+                        positiveAction = positiveAction,
+                        negativeAction = negativeAction
+                    ) {
+                        showDialog = false
+                    }
+                }
+                Spacer(modifier = Modifier)
+            }
+
+            is BaseException.SnackBarException -> {
                 ShowSnackBar(
-                    hostState = snackBarHostState,
+                    hostState = hostState,
                     message = (state.exception as BaseException.SnackBarException).message
                 )
+                Spacer(modifier = Modifier)
+            }
+
+            is BaseException.InlineException -> {
+                inlineActions?.invoke((state.exception as BaseException.InlineException).tags)
+                Spacer(modifier = Modifier)
+            }
+
+            is BaseException.RedirectException -> {
+                redirectAction?.invoke((state.exception as BaseException.RedirectException).redirect)
+                Spacer(modifier = Modifier)
+            }
+
         }
-        else -> content(state)
     }
 }
 
@@ -53,33 +130,28 @@ fun ShowOnPageException(onPage: BaseException.OnPageException) {
 }
 
 @Composable
-fun ShowAlertDialog(dialog: BaseException.AlertException) {
+fun ShowAlertDialog(
+    dialog: BaseException.AlertException,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         modifier = Modifier.padding(20.dp),
-        onDismissRequest = { },
-        title = {
-            dialog.title?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.body1
-                )
-            }
-        },
+        onDismissRequest = { onDismiss.invoke() },
+        title = dialog.title?.let { { Text(text = dialog.title, color = MaterialTheme.colors.onSecondary) } },
         text = {
             Text(
                 text = dialog.message,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body2
             )
         },
         confirmButton = {
-            Text(
-                text = stringResource(id = android.R.string.ok),
-                style = MaterialTheme.typography.button,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .clickable { }
-            )
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(id = android.R.string.ok),
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.primary
+                )
+            }
         }
     )
 }
@@ -91,13 +163,16 @@ fun ShowToast(toast: BaseException.ToastException) {
 }
 
 @Composable
-fun ShowDialog(dialog: Dialog) {
+fun ShowDialog(
+    dialog: Dialog,
+    positiveAction: ((Int?, Any?) -> Unit)? = null,
+    negativeAction: ((Int?, Any?) -> Unit)? = null,
+    onDismiss: () -> Unit
+) {
     AlertDialog(
         modifier = Modifier.padding(20.dp),
-        onDismissRequest = { },
-        title = {
-            dialog.title?.let { Text(text = dialog.title) }
-        },
+        onDismissRequest = { onDismiss.invoke() },
+        title = dialog.title?.let { { Text(text = dialog.title) } },
         text = {
             dialog.message?.let {
                 Text(
@@ -114,19 +189,25 @@ fun ShowDialog(dialog: Dialog) {
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(15.dp)
-                        .clickable { }
+                        .clickable {
+                            positiveAction?.invoke(dialog.positiveAction, dialog.positiveObject)
+                            onDismiss.invoke()
+                        }
                 )
             }
         },
-        dismissButton = {
-            dialog.negativeMessage?.let {
+        dismissButton = dialog.negativeMessage?.let {
+            {
                 Text(
                     text = dialog.negativeMessage,
                     style = MaterialTheme.typography.button,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier
                         .padding(15.dp)
-                        .clickable { }
+                        .clickable {
+                            negativeAction?.invoke(dialog.positiveAction, dialog.positiveObject)
+                            onDismiss.invoke()
+                        }
                 )
             }
         }

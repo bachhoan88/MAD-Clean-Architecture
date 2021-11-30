@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +46,7 @@ fun HourlyWeatherItem(
                     .padding(4.dp)
                     .align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.body1.copy(
-                    color = MaterialTheme.colors.onSurface,
+                    color = Color.White,
                     fontSize = 12.sp
                 )
             )
@@ -75,7 +76,7 @@ fun HourlyWeatherItem(
                     text = hourly.temp,
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 18.sp
                     ),
                 )
@@ -84,7 +85,7 @@ fun HourlyWeatherItem(
                     text = stringResource(R.string.zero),
                     modifier = Modifier,
                     style = MaterialTheme.typography.body1.copy(
-                        color = MaterialTheme.colors.onSurface,
+                        color = Color.White,
                         fontSize = 12.sp
                     ),
                 )

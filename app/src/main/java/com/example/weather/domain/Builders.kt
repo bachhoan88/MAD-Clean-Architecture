@@ -1,6 +1,5 @@
 package com.example.weather.domain
 
-import android.content.Context
 import com.example.weather.data.Constants
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
