@@ -15,7 +15,12 @@ The example shows current weather from World Cities and other information such a
 -------------
 
 ### Data-Flow
+I use the `Kotlin Flow` for data stream flow
 ![Structure](images/data-flow.jpg "Data flow")
+
+### Error-Flow
+All `Exceptions` from `API`, `Local` or `Invalid UseCase` will mapper to `BaseException`
+![Exception handler](images/error-flow.jpg "Error Flow")
 
 Updating...
 
