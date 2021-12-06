@@ -17,5 +17,5 @@ data class Hourly(
     @SerializedName("wind_deg") val windDeg: Int,
     @SerializedName("wind_gust") val windGust: Double,
     @SerializedName("weather") val weather: List<WeatherItem>,
-    @SerializedName("pop") val pop: Int
+    @SerializedName("pop") val pop: Double
 ) : DataModel()
