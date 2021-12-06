@@ -5,7 +5,12 @@ import com.example.weather.data.remote.mapper.ExceptionMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.suspendCancellableCoroutine
-import retrofit2.*
+import retrofit2.Call
+import retrofit2.CallAdapter
+import retrofit2.Callback
+import retrofit2.HttpException
+import retrofit2.Response
+import retrofit2.Retrofit
 import java.io.IOException
 import java.lang.reflect.Type
 import kotlin.coroutines.resume
@@ -22,7 +27,6 @@ class FlowCallAdapter<T>(
                 suspendCancellableCoroutine { continuation ->
                     call.enqueue(object : Callback<T> {
                         override fun onFailure(call: Call<T>, t: Throwable) {
-                            println("------------ throwable: $t")
                             continuation.resumeWithException(mapper.mapperToBaseException(asRetrofitException(t)))
                         }
 

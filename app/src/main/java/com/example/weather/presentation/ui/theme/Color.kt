@@ -14,7 +14,6 @@ val Red800 = Color(0xffd00036)
 val Red900 = Color(0xffc20029)
 val White60 = Color(0x66FFFFFF)
 
-
-//#3E4067
+// #3E4067
 val LightColor = Color(0xFF3E4067)
 val DarkColor = Color(0xFFFFFFFF)

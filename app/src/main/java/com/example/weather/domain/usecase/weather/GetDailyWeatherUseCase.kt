@@ -3,7 +3,6 @@ package com.example.weather.domain.usecase.weather
 import android.content.Context
 import com.example.weather.R
 import com.example.weather.data.model.Daily
-import com.example.weather.data.model.Hourly
 import com.example.weather.domain.asFlow
 import com.example.weather.domain.exception.BaseException
 import com.example.weather.domain.repository.WeatherRepository

@@ -8,7 +8,7 @@ open class ViewState(
 )
 
 fun Throwable.toBaseException(): BaseException {
-    return when(this) {
+    return when (this) {
         is BaseException -> this
         else -> BaseException.AlertException(code = -1, message = this.message ?: "")
     }

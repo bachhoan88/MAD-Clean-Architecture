@@ -41,6 +41,5 @@ class ExceptionMapper @Inject constructor(
 
             else -> throwable
         }
-
     }
 }

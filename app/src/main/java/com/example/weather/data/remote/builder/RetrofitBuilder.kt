@@ -113,9 +113,11 @@ class RetrofitBuilder @Inject constructor(
             readTimeout(readTimeout, TimeUnit.SECONDS)
 
             if (logEnable) {
-                addInterceptor(HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY
-                })
+                addInterceptor(
+                    HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                    }
+                )
             }
 
             interceptors.forEach { addInterceptor(it) }

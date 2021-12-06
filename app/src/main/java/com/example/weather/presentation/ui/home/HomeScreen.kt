@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -48,7 +47,6 @@ import com.example.weather.presentation.ui.custom.BackgroundImage
 import com.example.weather.presentation.ui.theme.WeatherTheme
 import com.example.weather.presentation.ui.theme.White60
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -96,7 +94,7 @@ fun HomeScreenContent(
     openSearchView: (() -> Unit)? = null,
     focusRequest: FocusRequester = remember { FocusRequester() },
     keyboardController: SoftwareKeyboardController? = null,
-    actionSearch: (() -> Unit)? = null,
+    actionSearch: (() -> Unit)? = null
 ) {
     val drawableId = if (isSystemInDarkTheme()) R.drawable.background_night else R.drawable.background
 
@@ -126,7 +124,6 @@ fun HomeScreenContent(
                 val contentModifier = Modifier
                     .fillMaxSize()
                     .padding(all = 18.dp)
-
 
                 ExceptionHandleView(
                     state = homeViewState,
@@ -160,7 +157,7 @@ fun CurrentWeatherContent(
                     style = MaterialTheme.typography.body1.copy(
                         color = MaterialTheme.colors.onPrimary,
                         fontSize = 12.sp
-                    ),
+                    )
                 )
 
                 Column(
@@ -172,7 +169,7 @@ fun CurrentWeatherContent(
                         style = MaterialTheme.typography.body1.copy(
                             color = MaterialTheme.colors.onPrimary,
                             fontSize = 14.sp
-                        ),
+                        )
                     )
 
                     Text(
@@ -180,7 +177,7 @@ fun CurrentWeatherContent(
                         style = MaterialTheme.typography.h5.copy(
                             color = MaterialTheme.colors.onPrimary,
                             fontSize = 24.sp
-                        ),
+                        )
                     )
                 }
             }
@@ -194,7 +191,7 @@ fun CurrentWeatherContent(
                         color = MaterialTheme.colors.onPrimary,
                         fontSize = 62.sp,
                         fontWeight = FontWeight.Bold
-                    ),
+                    )
                 )
 
                 Text(
@@ -202,7 +199,7 @@ fun CurrentWeatherContent(
                     style = MaterialTheme.typography.h5.copy(
                         color = MaterialTheme.colors.onPrimary,
                         fontSize = 25.sp
-                    ),
+                    )
                 )
             }
         }
@@ -289,7 +286,7 @@ fun CurrentWeatherInfo(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 24.sp
-                    ),
+                    )
                 )
             }
         }
@@ -331,7 +328,7 @@ fun CurrentWeatherInfo(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 24.sp
-                    ),
+                    )
                 )
             }
         }
@@ -373,7 +370,7 @@ fun CurrentWeatherInfo(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 24.sp
-                    ),
+                    )
                 )
             }
         }
@@ -415,7 +412,7 @@ fun CurrentWeatherInfo(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 24.sp
-                    ),
+                    )
                 )
             }
         }
@@ -502,7 +499,7 @@ private fun HomeTopAppBar(
                             actionSearch?.invoke()
                             keyboardController?.hide()
                         }
-                    ),
+                    )
                 )
             }
         }

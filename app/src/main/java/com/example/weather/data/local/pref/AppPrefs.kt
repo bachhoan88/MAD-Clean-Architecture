@@ -2,8 +2,8 @@ package com.example.weather.data.local.pref
 
 import android.content.Context
 import androidx.core.content.edit
-import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 class AppPrefs @Inject constructor(
     @ApplicationContext private val context: Context

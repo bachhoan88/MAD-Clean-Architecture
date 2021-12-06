@@ -12,9 +12,11 @@ import java.util.*
  */
 fun <T> Throwable.asFlow(): Flow<T> {
     return flow {
-        emit(suspendCancellableCoroutine { continuation ->
-            continuation.cancel(this@asFlow)
-        })
+        emit(
+            suspendCancellableCoroutine { continuation ->
+                continuation.cancel(this@asFlow)
+            }
+        )
     }
 }
 

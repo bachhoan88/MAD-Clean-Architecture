@@ -19,5 +19,5 @@ data class Current(
     @SerializedName("clouds") val clouds: Int,
     @SerializedName("pop") val pop: Int,
     @SerializedName("visibility") val visibility: Int,
-    @SerializedName("uvi") val uvi: Double,
+    @SerializedName("uvi") val uvi: Double
 ) : DataModel()
