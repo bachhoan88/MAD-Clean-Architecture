@@ -7,9 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.weather.presentation.ui.day.SevenDaysScreen
-import com.example.weather.presentation.ui.day.SevenDaysViewModel
 import com.example.weather.presentation.ui.home.HomeScreen
-import com.example.weather.presentation.ui.home.HomeViewModel
 
 @Composable
 fun WeatherApp(appState: WeatherAppState = rememberWeatherAppState()) {

@@ -78,7 +78,7 @@ fun HourlyWeatherItem(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 18.sp
-                    ),
+                    )
                 )
 
                 Text(
@@ -87,7 +87,7 @@ fun HourlyWeatherItem(
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontSize = 12.sp
-                    ),
+                    )
                 )
             }
         }

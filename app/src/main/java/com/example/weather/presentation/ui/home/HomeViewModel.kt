@@ -27,8 +27,12 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(HomeViewState(isLoading = true))
-    override val state: StateFlow<HomeViewState>
-        get() = _state
+    override val state
+        get() = _state.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            _state.value
+        )
 
     init {
         viewModelScope.launch {
@@ -81,7 +85,7 @@ class HomeViewModel @Inject constructor(
                 .catch { throwable ->
                     _state.update { it.copy(isLoading = false, exception = throwable.toBaseException()) }
                 }
-                .map { it.map { hourlyWeatherMapper.mapperToViewDataModel(it) } }
+                .map { it.map { houry -> hourlyWeatherMapper.mapperToViewDataModel(houry) } }
                 .collect { weathers ->
                     _state.update { it.copy(hourlyWeathers = weathers) }
                 }

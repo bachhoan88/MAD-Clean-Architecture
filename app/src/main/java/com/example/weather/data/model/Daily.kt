@@ -21,5 +21,5 @@ data class Daily(
     @SerializedName("weather") val weather: List<WeatherItem>,
     @SerializedName("clouds") val clouds: Int,
     @SerializedName("pop") val pop: Int,
-    @SerializedName("uvi") val uvi: Double,
+    @SerializedName("uvi") val uvi: Double
 ) : DataModel()

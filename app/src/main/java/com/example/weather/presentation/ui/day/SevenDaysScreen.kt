@@ -10,5 +10,4 @@ fun SevenDaysScreen(
     long: Double = 105.8412,
     onBackPressed: () -> Unit
 ) {
-
 }
