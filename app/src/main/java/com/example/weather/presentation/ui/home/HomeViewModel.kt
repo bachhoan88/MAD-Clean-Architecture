@@ -40,6 +40,8 @@ class HomeViewModel @Inject constructor(
     }
 
     fun getWeather(city: String) {
+        _state.update { HomeViewState(isLoading = true) }
+
         viewModelScope.launch {
             getCurrentWeatherByCityUseCase.execute(GetCurrentWeatherByCityUseCase.Params(city))
                 .catch { throwable ->
@@ -52,6 +54,24 @@ class HomeViewModel @Inject constructor(
                 .collect { weather ->
                     _state.update { it.copy(isLoading = false, currentWeather = weather) }
                 }
+        }
+    }
+
+    /**
+     * Notify that the user when typing the search input
+     */
+    fun onSearchInputChanged(searchInput: String) {
+        _state.update {
+            it.copy(searchInput = searchInput)
+        }
+    }
+
+    /**
+     * Enable or disable search view
+     */
+    fun enableSearchView(enabled: Boolean) {
+        _state.update {
+            it.copy(searchEnabled = enabled, searchInput = if (!enabled) "" else it.searchInput)
         }
     }
 
@@ -73,5 +93,7 @@ data class HomeViewState(
     override val isLoading: Boolean = false,
     override val exception: BaseException? = null,
     val currentWeather: CurrentWeatherViewDataModel? = null,
-    val hourlyWeathers: List<HourlyWeatherViewDataModel> = emptyList()
+    val hourlyWeathers: List<HourlyWeatherViewDataModel> = emptyList(),
+    val searchInput: String = "",
+    val searchEnabled: Boolean = false
 ) : ViewState(isLoading, exception)

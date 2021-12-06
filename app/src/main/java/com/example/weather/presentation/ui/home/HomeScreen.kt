@@ -7,19 +7,29 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -38,8 +48,10 @@ import com.example.weather.presentation.ui.custom.BackgroundImage
 import com.example.weather.presentation.ui.theme.WeatherTheme
 import com.example.weather.presentation.ui.theme.White60
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
@@ -47,22 +59,44 @@ fun HomeScreen(
 ) {
     val viewState by viewModel.state.collectAsState()
     val scaffoldState = rememberScaffoldState()
+    val requestFocus = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     HomeScreenContent(
         modifier = Modifier
             .statusBarsPadding()
             .navigationBarsPadding(),
         scaffoldState = scaffoldState,
-        homeViewState = viewState
+        homeViewState = viewState,
+        closeSearchView = {
+            viewModel.enableSearchView(false)
+        },
+        onSearchChange = {
+            viewModel.onSearchInputChanged(it)
+        },
+        openSearchView = {
+            viewModel.enableSearchView(true)
+        },
+        focusRequest = requestFocus,
+        keyboardController = keyboardController,
+        actionSearch = {
+            viewModel.getWeather(viewState.searchInput)
+        }
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreenContent(
-    showTopAppBar: Boolean = true,
     modifier: Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    homeViewState: HomeViewState = HomeViewState()
+    homeViewState: HomeViewState = HomeViewState(),
+    onSearchChange: ((String) -> Unit)? = null,
+    closeSearchView: (() -> Unit)? = null,
+    openSearchView: (() -> Unit)? = null,
+    focusRequest: FocusRequester = remember { FocusRequester() },
+    keyboardController: SoftwareKeyboardController? = null,
+    actionSearch: (() -> Unit)? = null,
 ) {
     val drawableId = if (isSystemInDarkTheme()) R.drawable.background_night else R.drawable.background
 
@@ -75,9 +109,16 @@ fun HomeScreenContent(
             Scaffold(
                 scaffoldState = scaffoldState,
                 topBar = {
-                    if (showTopAppBar) {
-                        HomeTopAppBar()
-                    }
+                    HomeTopAppBar(
+                        searchQuery = homeViewState.searchInput,
+                        onSearchChange = onSearchChange,
+                        showSearchView = homeViewState.searchEnabled,
+                        closeSearchView = closeSearchView,
+                        openSearchView = openSearchView,
+                        focusRequest = focusRequest,
+                        keyboardController = keyboardController,
+                        actionSearch = actionSearch
+                    )
                 },
                 modifier = modifier,
                 backgroundColor = Color.Transparent
@@ -393,44 +434,119 @@ fun CurrentWeatherInfo(
 /**
  * TopAppBar for the Home screen
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun HomeTopAppBar(
     elevation: Dp = 0.dp,
+    showSearchView: Boolean = false,
+    searchQuery: String = "",
+    onSearchChange: ((String) -> Unit)? = null,
+    closeSearchView: (() -> Unit)? = null,
+    openSearchView: (() -> Unit)? = null,
+    actionSearch: (() -> Unit)? = null,
+    focusRequest: FocusRequester = remember { FocusRequester() },
+    keyboardController: SoftwareKeyboardController? = null
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.app_name),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 4.dp, top = 12.dp),
-                style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.onPrimary),
-                textAlign = TextAlign.Center
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = { /* TODO */ }) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_menu_drawer),
-                    contentDescription = stringResource(R.string.menu),
-                    tint = MaterialTheme.colors.primary
+    if (showSearchView) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = 8.dp
+        ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                IconButton(
+                    onClick = { closeSearchView?.invoke() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.close),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+
+                TextField(
+                    modifier = Modifier
+                        .focusRequester(focusRequest)
+                        .weight(1f)
+                        .background(color = Color.Transparent),
+                    value = searchQuery,
+                    shape = RoundedCornerShape(size = 0.dp),
+                    onValueChange = { value ->
+                        onSearchChange?.invoke(value)
+                    },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.search_city)
+                        )
+                    },
+                    trailingIcon = if (searchQuery.isNotEmpty()) {
+                        {
+                            IconButton(
+                                onClick = { onSearchChange?.invoke("") }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Close,
+                                    contentDescription = stringResource(R.string.remove),
+                                    tint = MaterialTheme.colors.primary
+                                )
+                            }
+                        }
+                    } else null,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            actionSearch?.invoke()
+                            keyboardController?.hide()
+                        }
+                    ),
                 )
             }
-        },
-        actions = {
-            IconButton(onClick = { /* TODO: Open search */ }) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(R.string.search_city),
-                    tint = MaterialTheme.colors.primary
+        }
+
+        LaunchedEffect(keyboardController) {
+            focusRequest.requestFocus()
+        }
+    } else {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 4.dp, top = 12.dp),
+                    style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.onPrimary),
+                    textAlign = TextAlign.Center
                 )
-            }
-        },
-        backgroundColor = Color.Transparent,
-        elevation = elevation
-    )
+            },
+            navigationIcon = {
+                IconButton(onClick = { closeSearchView?.invoke() }) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_menu_drawer),
+                        contentDescription = stringResource(R.string.menu),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { openSearchView?.invoke() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = stringResource(R.string.search_city),
+                        tint = MaterialTheme.colors.primary
+                    )
+                }
+            },
+            backgroundColor = Color.Transparent,
+            elevation = elevation
+        )
+    }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
 fun HomeTopAppBarPreview() {

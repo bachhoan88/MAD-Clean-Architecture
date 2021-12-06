@@ -22,6 +22,7 @@ class FlowCallAdapter<T>(
                 suspendCancellableCoroutine { continuation ->
                     call.enqueue(object : Callback<T> {
                         override fun onFailure(call: Call<T>, t: Throwable) {
+                            println("------------ throwable: $t")
                             continuation.resumeWithException(mapper.mapperToBaseException(asRetrofitException(t)))
                         }
 
