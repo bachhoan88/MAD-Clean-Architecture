@@ -18,3 +18,4 @@ key.properties
 keystore
 app/dev/*
 app/prod/*
+.idea/*
