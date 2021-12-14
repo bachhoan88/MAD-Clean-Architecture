@@ -19,4 +19,5 @@
     <string name="zero">0</string>
     <string name="close">Close</string>
     <string name="remove">Remove</string>
+    <string name="next_7_days">Next 7 days</string>
 </resources>

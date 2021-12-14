@@ -1,31 +1,40 @@
 package com.example.weather.presentation.ui.home
 
-import android.content.res.Configuration
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -40,30 +49,36 @@ import coil.compose.rememberImagePainter
 import com.example.weather.R
 import com.example.weather.presentation.base.ExceptionHandleView
 import com.example.weather.presentation.model.CurrentWeatherViewDataModel
-import com.example.weather.presentation.model.HourlyWeatherViewDataModel
 import com.example.weather.presentation.model.factory.createCurrentWeather
-import com.example.weather.presentation.model.factory.createHourlyWeathers
 import com.example.weather.presentation.ui.custom.BackgroundImage
+import com.example.weather.presentation.ui.rememberLazyListState
 import com.example.weather.presentation.ui.theme.WeatherTheme
 import com.example.weather.presentation.ui.theme.White60
-import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
-    navigateToNextSevenDay: (Float, Float) -> Unit
+    navigateToNextSevenDay: (Double, Double) -> Unit,
+    todayLazyListState: LazyListState = rememberLazyListState(),
+    tomorrowLazyListState: LazyListState = rememberLazyListState(),
 ) {
     val viewState by viewModel.state.collectAsState()
     val scaffoldState = rememberScaffoldState()
     val requestFocus = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val listState = mapOf(
+        WeatherIndex.Today to todayLazyListState,
+        WeatherIndex.Tomorrow to tomorrowLazyListState
+    )
 
     HomeScreenContent(
         modifier = Modifier
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .statusBarsPadding(),
         scaffoldState = scaffoldState,
         homeViewState = viewState,
         closeSearchView = {
@@ -77,8 +92,18 @@ fun HomeScreen(
         },
         focusRequest = requestFocus,
         keyboardController = keyboardController,
+        weatherLazyListState = listState,
         actionSearch = {
-            viewModel.getWeather(viewState.searchInput)
+            coroutineScope.launch {
+                tomorrowLazyListState.scrollToItem(0, 0)
+            }
+            viewModel.getWeather(viewState.searchState.query)
+        },
+        onWeatherIndexChanged = { index ->
+            viewModel.weatherIndexChanged(index)
+        },
+        actionNext7Days = {
+            navigateToNextSevenDay.invoke(viewModel.coordinate.value.first, viewModel.coordinate.value.second)
         }
     )
 }
@@ -94,7 +119,10 @@ fun HomeScreenContent(
     openSearchView: (() -> Unit)? = null,
     focusRequest: FocusRequester = remember { FocusRequester() },
     keyboardController: SoftwareKeyboardController? = null,
-    actionSearch: (() -> Unit)? = null
+    actionSearch: (() -> Unit)? = null,
+    onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null,
+    weatherLazyListState: Map<WeatherIndex, LazyListState> = mapOf(),
+    actionNext7Days: (() -> Unit)? = null
 ) {
     val drawableId = if (isSystemInDarkTheme()) R.drawable.background_night else R.drawable.background
 
@@ -108,9 +136,9 @@ fun HomeScreenContent(
                 scaffoldState = scaffoldState,
                 topBar = {
                     HomeTopAppBar(
-                        searchQuery = homeViewState.searchInput,
+                        searchQuery = homeViewState.searchState.query,
                         onSearchChange = onSearchChange,
-                        showSearchView = homeViewState.searchEnabled,
+                        showSearchView = homeViewState.searchState.enabled,
                         closeSearchView = closeSearchView,
                         openSearchView = openSearchView,
                         focusRequest = focusRequest,
@@ -130,7 +158,15 @@ fun HomeScreenContent(
                     snackBarHostState = scaffoldState.snackbarHostState
                 ) {
                     if (homeViewState.currentWeather != null) {
-                        CurrentWeatherContent(modifier = contentModifier, homeViewState.currentWeather, homeViewState.hourlyWeathers)
+                        CurrentWeatherContent(
+                            modifier = contentModifier,
+                            currentWeather = homeViewState.currentWeather,
+                            weatherState = homeViewState.weatherState,
+                            weatherLazyListState = weatherLazyListState,
+                            weatherIndex = homeViewState.weatherState.weatherIndex,
+                            onWeatherIndexChanged = onWeatherIndexChanged,
+                            actionNext7Days = actionNext7Days
+                        )
                     }
                 }
             }
@@ -142,7 +178,11 @@ fun HomeScreenContent(
 fun CurrentWeatherContent(
     modifier: Modifier = Modifier,
     currentWeather: CurrentWeatherViewDataModel,
-    hourlyWeathers: List<HourlyWeatherViewDataModel> = emptyList()
+    weatherState: WeatherState = WeatherState.Today(),
+    weatherLazyListState: Map<WeatherIndex, LazyListState>,
+    weatherIndex: WeatherIndex = WeatherIndex.Today,
+    onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null,
+    actionNext7Days: (() -> Unit)? = null
 ) {
     Column(modifier = modifier) {
         Row(
@@ -212,13 +252,40 @@ fun CurrentWeatherContent(
             currentWeather = currentWeather
         )
 
+        Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            HomeWeatherTabs(
+                modifier = Modifier.weight(1f),
+                weatherIndex = weatherIndex,
+                onWeatherIndexChanged = onWeatherIndexChanged
+            )
+
+            TextButton(
+                onClick = {
+                    actionNext7Days?.invoke()
+                },
+                modifier = Modifier.wrapContentWidth()
+            ) {
+                Text(text = stringResource(R.string.next_7_days), color = Color.White)
+
+                Icon(
+                    imageVector = Icons.Filled.ArrowForwardIos,
+                    contentDescription = stringResource(R.string.next_7_days),
+                    modifier = Modifier.padding(start = 2.dp).width(12.dp).height(12.dp),
+                    tint = Color.White
+                )
+            }
+        }
+
         Box(
             modifier = Modifier
-                .padding(top = 8.dp)
                 .height(124.dp)
         ) {
-            LazyRow {
-                items(hourlyWeathers) { hourly ->
+            val state by derivedStateOf {
+                weatherLazyListState.getValue(weatherIndex)
+            }
+
+            LazyRow(state = state) {
+                items(weatherState.weathers) { hourly ->
                     HourlyWeatherItem(hourly = hourly)
                 }
             }
@@ -429,6 +496,70 @@ fun CurrentWeatherInfo(
 }
 
 /**
+ * More weathers
+ */
+@Composable
+fun HomeWeatherTabs(
+    tabsContent: Array<String> = stringArrayResource(R.array.days),
+    modifier: Modifier,
+    weatherIndex: WeatherIndex = WeatherIndex.Today,
+    onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null
+) {
+    val tabRowHeight = 6.dp
+    TabRow(
+        modifier = modifier,
+        selectedTabIndex = weatherIndex.value(),
+        backgroundColor = Color.Transparent,
+        divider = {
+            TabRowDefaults.Divider(
+                thickness = tabRowHeight,
+                color = Color.Transparent
+            )
+        },
+        indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                modifier = Modifier.customTabIndicator(tabPositions[weatherIndex.value()], tabRowHeight),
+                height = tabRowHeight,
+                color = Color.White
+            )
+        }
+    ) {
+        tabsContent.forEachIndexed { index, text ->
+            Tab(selected = weatherIndex.value() == index, onClick = {
+                onWeatherIndexChanged?.invoke(WeatherIndex.from(index))
+            }, text = {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.body1,
+                    color = Color.White
+                )
+            })
+        }
+    }
+}
+
+fun Modifier.customTabIndicator(
+    currentTabPosition: TabPosition,
+    tabRowHeight: Dp
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "tabIndicator"
+        value = currentTabPosition
+    }
+) {
+    val currentTabWidth = currentTabPosition.width
+    val indicatorOffset by animateDpAsState(
+        targetValue = currentTabPosition.left + currentTabWidth / 2 - tabRowHeight / 2,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+    )
+    fillMaxWidth()
+        .wrapContentSize(Alignment.BottomStart)
+        .offset(x = indicatorOffset)
+        .clip(CircleShape)
+        .width(tabRowHeight)
+}
+
+/**
  * TopAppBar for the Home screen
  */
 @OptIn(ExperimentalComposeUiApi::class)
@@ -562,42 +693,6 @@ fun CurrentWeatherInfoPreview() {
             CurrentWeatherInfo(
                 modifier = Modifier.height(200.dp),
                 currentWeather = createCurrentWeather()
-            )
-        }
-    }
-}
-
-@Preview("Default colors")
-@Composable
-fun HomeScreenContentPreview() {
-    WeatherTheme {
-        Surface {
-            HomeScreenContent(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .navigationBarsPadding(),
-                homeViewState = HomeViewState(
-                    currentWeather = createCurrentWeather(),
-                    hourlyWeathers = createHourlyWeathers()
-                )
-            )
-        }
-    }
-}
-
-@Preview("Dark colors", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun HomeScreenContentDarkPreview() {
-    WeatherTheme {
-        Surface {
-            HomeScreenContent(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .navigationBarsPadding(),
-                homeViewState = HomeViewState(
-                    currentWeather = createCurrentWeather(),
-                    hourlyWeathers = createHourlyWeathers()
-                )
             )
         }
     }

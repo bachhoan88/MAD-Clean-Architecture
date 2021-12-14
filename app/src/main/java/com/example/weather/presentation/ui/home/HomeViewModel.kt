@@ -17,6 +17,56 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class WeatherIndex(private val index: Int) {
+    Today(0), Tomorrow(1);
+
+    fun value(): Int = index
+
+    companion object {
+        fun from(index: Int): WeatherIndex {
+            return if (index == 0) Today else Tomorrow
+        }
+    }
+}
+
+sealed interface WeatherState {
+    val weatherIndex: WeatherIndex
+    val weathers: List<HourlyWeatherViewDataModel>
+
+    data class Today(
+        override val weatherIndex: WeatherIndex = WeatherIndex.Today,
+        override val weathers: List<HourlyWeatherViewDataModel> = emptyList(),
+    ) : WeatherState
+
+    data class Tomorrow(
+        override val weatherIndex: WeatherIndex = WeatherIndex.Tomorrow,
+        override val weathers: List<HourlyWeatherViewDataModel> = emptyList(),
+    ) : WeatherState
+}
+
+sealed interface SearchState {
+    val enabled: Boolean
+    val query: String
+
+    data class Changing(
+        override val enabled: Boolean = true,
+        override val query: String = ""
+    ) : SearchState
+
+    data class Closed(
+        override val enabled: Boolean = false,
+        override val query: String = ""
+    ) : SearchState
+}
+
+data class HomeViewState(
+    override val isLoading: Boolean = false,
+    override val exception: BaseException? = null,
+    val currentWeather: CurrentWeatherViewDataModel? = null,
+    val weatherState: WeatherState = WeatherState.Today(),
+    val searchState: SearchState = SearchState.Closed()
+) : ViewState(isLoading, exception)
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getCurrentWeatherByCityUseCase: GetCurrentWeatherByCityUseCase,
@@ -27,12 +77,13 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _state = MutableStateFlow(HomeViewState(isLoading = true))
-    override val state
-        get() = _state.stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            _state.value
-        )
+    override val state: StateFlow<HomeViewState>
+        get() = _state
+
+    val coordinate = MutableStateFlow(Pair(0.0, 0.0))
+
+    private val todayState = MutableStateFlow(WeatherState.Today())
+    private val tomorrowState = MutableStateFlow(WeatherState.Tomorrow())
 
     init {
         viewModelScope.launch {
@@ -52,11 +103,14 @@ class HomeViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false, exception = throwable.toBaseException()) }
                 }
                 .map { weather ->
+                    coordinate.update { it.copy(first = weather.coord.lat, second = weather.coord.long) }
                     getHourlyWeathers(weather.coord.lat, weather.coord.long)
                     weatherMapper.mapperToViewDataModel(weather)
                 }
                 .collect { weather ->
-                    _state.update { it.copy(isLoading = false, currentWeather = weather) }
+                    _state.update {
+                        it.copy(isLoading = false, currentWeather = weather)
+                    }
                 }
         }
     }
@@ -66,7 +120,7 @@ class HomeViewModel @Inject constructor(
      */
     fun onSearchInputChanged(searchInput: String) {
         _state.update {
-            it.copy(searchInput = searchInput)
+            it.copy(searchState = SearchState.Changing(query = searchInput))
         }
     }
 
@@ -74,9 +128,16 @@ class HomeViewModel @Inject constructor(
      * Enable or disable search view
      */
     fun enableSearchView(enabled: Boolean) {
-        _state.update {
-            it.copy(searchEnabled = enabled, searchInput = if (!enabled) "" else it.searchInput)
+        _state.update { state ->
+            state.copy(searchState = if (enabled) SearchState.Changing() else SearchState.Closed(query = state.searchState.query))
         }
+    }
+
+    /**
+     * Change hourly weather today or tomorrow
+     */
+    fun weatherIndexChanged(index: WeatherIndex) {
+        _state.update { it.copy(weatherState = if (index == WeatherIndex.Today) todayState.value else tomorrowState.value) }
     }
 
     private fun getHourlyWeathers(lat: Double, long: Double) {
@@ -85,19 +146,17 @@ class HomeViewModel @Inject constructor(
                 .catch { throwable ->
                     _state.update { it.copy(isLoading = false, exception = throwable.toBaseException()) }
                 }
-                .map { it.map { houry -> hourlyWeatherMapper.mapperToViewDataModel(houry) } }
-                .collect { weathers ->
-                    _state.update { it.copy(hourlyWeathers = weathers) }
+                .map { response ->
+                    Pair(
+                        response.today.map { hourlyWeatherMapper.mapperToViewDataModel(it) },
+                        response.tomorrow.map { hourlyWeatherMapper.mapperToViewDataModel(it) }
+                    )
+                }
+                .collect { pair ->
+                    todayState.update { WeatherState.Today(weathers = pair.first) }
+                    tomorrowState.update { WeatherState.Tomorrow(weathers = pair.second) }
+                    _state.update { it.copy(weatherState = todayState.value) }
                 }
         }
     }
 }
-
-data class HomeViewState(
-    override val isLoading: Boolean = false,
-    override val exception: BaseException? = null,
-    val currentWeather: CurrentWeatherViewDataModel? = null,
-    val hourlyWeathers: List<HourlyWeatherViewDataModel> = emptyList(),
-    val searchInput: String = "",
-    val searchEnabled: Boolean = false
-) : ViewState(isLoading, exception)
