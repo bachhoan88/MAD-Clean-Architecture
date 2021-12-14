@@ -29,17 +29,6 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [
-                        "room.incremental"          : "true",
-                        "room.expandProjection"     : "true",
-                        "room.schemaLocation"       : "$projectDir/schemas".toString(),
-                        "dagger.gradle.incremental" : "true"
-                ]
-            }
-        }
     }
 
     flavorDimensions "environment"
@@ -137,6 +126,7 @@ dependencies {
 
     implementation Libs.AndroidX.Room.runtime
     implementation Libs.AndroidX.Room.ktx
+    testImplementation Libs.Coroutines.test
 
     kapt Libs.AndroidX.Room.compiler
 }

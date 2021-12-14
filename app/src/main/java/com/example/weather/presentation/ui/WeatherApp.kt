@@ -11,6 +11,9 @@ import com.example.weather.presentation.ui.home.HomeScreen
 
 @Composable
 fun WeatherApp(appState: WeatherAppState = rememberWeatherAppState()) {
+    val todayLazyListState = rememberLazyListState()
+    val tomorrowLazyListState = rememberLazyListState()
+
     NavHost(
         navController = appState.controller,
         startDestination = Screen.Home.route
@@ -19,8 +22,10 @@ fun WeatherApp(appState: WeatherAppState = rememberWeatherAppState()) {
             HomeScreen(
                 viewModel = hiltViewModel(),
                 navigateToNextSevenDay = { lat, long ->
-                    appState.navigateToSevenDays(lat, long)
-                }
+                    appState.navigateToSevenDays(lat.toFloat(), long.toFloat())
+                },
+                todayLazyListState = todayLazyListState,
+                tomorrowLazyListState = tomorrowLazyListState
             )
         }
 

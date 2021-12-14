@@ -12,7 +12,6 @@ private val LightThemeColors = lightColors(
     primaryVariant = Purple700,
     onPrimary = LightColor,
     secondary = Teal200,
-    secondaryVariant = Red900,
     error = Red800,
     onSecondary = Color.Black
 )
