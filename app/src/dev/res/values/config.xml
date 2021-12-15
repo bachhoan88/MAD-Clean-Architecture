@@ -2,6 +2,5 @@
 <resources>
     <string name="base_url">https://api.openweathermap.org/data/2.5/</string>
     <string name="com.crashlytics.android.build_id">RANDOM_UUID</string>
-<!--    <string name="weather_app_id">WEATHER_APP_ID</string>-->
-    <string name="weather_app_id">19db43609e401fea86cc6f8d7e2bc8cd</string>
+    <string name="weather_app_id">WEATHER_APP_ID</string>
 </resources>
