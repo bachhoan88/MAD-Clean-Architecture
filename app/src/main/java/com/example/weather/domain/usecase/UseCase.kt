@@ -1,11 +1,15 @@
 package com.example.weather.domain.usecase
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 
-abstract class UseCase<in Params, out T> where T : Any {
+abstract class UseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
+    operator fun invoke(parameters: P? = null): Flow<R> = execute(parameters)
+        .flowOn(coroutineDispatcher)
 
-    abstract fun execute(params: Params? = null): Flow<T>
+    protected abstract fun execute(params: P? = null): Flow<R>
 
-    // need call cancel any coroutine jobs
-    fun onCleared() { }
+    /// Clear anything when call different viewModelScope
+    fun onCleared() {}
 }
