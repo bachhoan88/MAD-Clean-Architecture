@@ -10,6 +10,6 @@ abstract class UseCase<in P, R>(private val coroutineDispatcher: CoroutineDispat
 
     protected abstract fun execute(params: P? = null): Flow<R>
 
-    /// Clear anything when call different viewModelScope
+    // Clear anything when call different viewModelScope
     fun onCleared() {}
 }
