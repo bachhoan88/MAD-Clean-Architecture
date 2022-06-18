@@ -4,17 +4,20 @@ import android.content.Context
 import com.example.weather.R
 import com.example.weather.data.model.Daily
 import com.example.weather.domain.asFlow
+import com.example.weather.domain.di.IoDispatcher
 import com.example.weather.domain.exception.BaseException
 import com.example.weather.domain.repository.WeatherRepository
 import com.example.weather.domain.usecase.UseCase
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetDailyWeatherUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context
-) : UseCase<GetDailyWeatherUseCase.Params, List<Daily>>() {
+) : UseCase<GetDailyWeatherUseCase.Params, List<Daily>>(dispatcher) {
 
     override fun execute(params: Params?): Flow<List<Daily>> {
         if (params != null) {

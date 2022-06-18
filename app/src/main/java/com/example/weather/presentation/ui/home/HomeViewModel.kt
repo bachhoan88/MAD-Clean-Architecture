@@ -87,7 +87,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getLastCityUseCase.execute()
+            getLastCityUseCase.invoke()
                 .collect { city ->
                     getWeather(city)
                 }
@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
         _state.update { HomeViewState(isLoading = true) }
 
         viewModelScope.launch {
-            getCurrentWeatherByCityUseCase.execute(GetCurrentWeatherByCityUseCase.Params(city))
+            getCurrentWeatherByCityUseCase.invoke(GetCurrentWeatherByCityUseCase.Params(city))
                 .catch { throwable ->
                     _state.update { it.copy(isLoading = false, exception = throwable.toBaseException()) }
                 }
@@ -142,7 +142,7 @@ class HomeViewModel @Inject constructor(
 
     private fun getHourlyWeathers(lat: Double, long: Double) {
         viewModelScope.launch {
-            getHourlyWeatherUseCase.execute(GetHourlyWeatherUseCase.Params(lat, long))
+            getHourlyWeatherUseCase.invoke(GetHourlyWeatherUseCase.Params(lat, long))
                 .catch { throwable ->
                     _state.update { it.copy(isLoading = false, exception = throwable.toBaseException()) }
                 }

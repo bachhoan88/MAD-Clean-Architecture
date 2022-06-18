@@ -17,7 +17,7 @@ object Libs {
     }
 
     object Kotlin {
-        const val version = "1.5.31"
+        const val version = "1.6.21"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -31,7 +31,7 @@ object Libs {
     }
     
     object Hilt {
-        private const val version = "2.40"
+        private const val version = "2.41"
         const val android = "com.google.dagger:hilt-android:$version"
         const val compiler = "com.google.dagger:hilt-android-compiler:$version"
         const val gradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:$version"
@@ -76,8 +76,8 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.1.0-beta02"
-            private const val hiltCompose = "1.0.0-alpha03"
+            const val version = "1.1.1"
+            private const val hiltCompose = "1.0.0"
 
             @get:JvmStatic
             val snapshotUrl: String
