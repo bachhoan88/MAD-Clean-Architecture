@@ -16,14 +16,14 @@ if (keyFile.exists()) {
 }
 
 android {
-    compileSdk 31
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.weather"
         minSdk 21
-        targetSdk 31
-        versionCode 3
-        versionName "1.0.2"
+        targetSdk 34
+        versionCode 4
+        versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -57,7 +57,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-        useIR = true
     }
     buildFeatures {
         compose true
@@ -80,6 +79,7 @@ android {
             option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
         }
     }
+    namespace 'com.example.weather'
 }
 
 dependencies {
