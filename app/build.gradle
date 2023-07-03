@@ -16,14 +16,14 @@ if (keyFile.exists()) {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.weather"
         minSdk 21
-        targetSdk 31
-        versionCode 3
-        versionName "1.0.2"
+        targetSdk 33
+        versionCode 4
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

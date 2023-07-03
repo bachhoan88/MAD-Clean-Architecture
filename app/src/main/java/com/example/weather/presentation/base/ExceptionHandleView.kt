@@ -67,10 +67,10 @@ fun ShowError(
                 ShowOnPageException(onPage = state.exception as BaseException.OnPageException)
 
             is BaseException.AlertException -> {
-                var showAlert by rememberSaveable { mutableStateOf(true) }
-                if (showAlert) {
+                var instanceHashCode by remember { mutableStateOf("") }
+                if (instanceHashCode != state.exception?.hashCode) {
                     ShowAlertDialog(dialog = state.exception as BaseException.AlertException) {
-                        showAlert = false
+                        instanceHashCode = state.exception?.hashCode ?: ""
                     }
                 }
                 Spacer(modifier = Modifier)
@@ -82,14 +82,14 @@ fun ShowError(
             }
 
             is BaseException.DialogException -> {
-                var showDialog by rememberSaveable { mutableStateOf(true) }
-                if (showDialog) {
+                var instanceHashCode by remember { mutableStateOf("") }
+                if (instanceHashCode != state.exception?.hashCode) {
                     ShowDialog(
                         dialog = (state.exception as BaseException.DialogException).dialog,
                         positiveAction = positiveAction,
                         negativeAction = negativeAction
                     ) {
-                        showDialog = false
+                        instanceHashCode = state.exception?.hashCode ?: ""
                     }
                 }
                 Spacer(modifier = Modifier)

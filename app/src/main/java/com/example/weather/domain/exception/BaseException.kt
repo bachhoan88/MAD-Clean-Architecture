@@ -8,7 +8,8 @@ import com.example.weather.domain.model.Tag
 sealed class BaseException(
     open val code: Int,
     @ExceptionType val type: Int,
-    override val message: String?
+    override val message: String?,
+    val hashCode: String? = "${System.nanoTime()}"
 ) : Throwable(message) {
 
     data class AlertException(
