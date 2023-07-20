@@ -1,6 +1,7 @@
 package com.example.weather.presentation.ui.day
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -57,12 +58,11 @@ fun SevenDaysScreenContent(
                     SevenDaysTopAppBar { onBackPressed?.invoke() }
                 },
                 modifier = modifier,
-                backgroundColor = Color.Transparent
-            ) {
-                val contentModifier = Modifier
-                    .fillMaxSize()
-                    .padding(all = 18.dp)
-            }
+                backgroundColor = Color.Transparent,
+                content = { paddingValues ->
+                    Box(modifier = Modifier.padding(paddingValues))
+                }
+            )
         }
     }
 }

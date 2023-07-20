@@ -17,7 +17,7 @@ object Libs {
     }
 
     object Kotlin {
-        const val version = "1.6.21"
+        const val version = "1.8.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -31,9 +31,9 @@ object Libs {
     }
     
     object Hilt {
-        private const val version = "2.41"
+        private const val version = "2.47"
         const val android = "com.google.dagger:hilt-android:$version"
-        const val compiler = "com.google.dagger:hilt-android-compiler:$version"
+        const val compiler = "com.google.dagger:hilt-compiler:$version"
         const val gradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:$version"
     }
 
@@ -64,7 +64,7 @@ object Libs {
         const val appcompat = "androidx.appcompat:appcompat:1.3.1"
         const val palette = "androidx.palette:palette:1.0.0"
 
-        const val coreKtx = "androidx.core:core-ktx:1.7.0"
+        const val coreKtx = "androidx.core:core-ktx:1.10.1"
 
         object Activity {
             const val activityCompose = "androidx.activity:activity-compose:1.4.0"
@@ -76,7 +76,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.1.1"
+            const val version = "1.4.3"
             private const val hiltCompose = "1.0.0"
 
             @get:JvmStatic
@@ -104,7 +104,7 @@ object Libs {
         }
 
         object Navigation {
-            const val navigation = "androidx.navigation:navigation-compose:2.4.0-beta02"
+            const val navigation = "androidx.navigation:navigation-compose:2.5.0"
         }
 
         object Test {

@@ -112,6 +112,10 @@ fun ShowError(
                 redirectAction?.invoke((state.exception as BaseException.RedirectException).redirect)
                 Spacer(modifier = Modifier)
             }
+
+            else -> {
+                Spacer(modifier = Modifier)
+            }
         }
     }
 }

@@ -73,7 +73,7 @@ fun HomeScreen(
 
     val listState = mapOf(
         WeatherIndex.Today to todayLazyListState,
-        WeatherIndex.Tomorrow to tomorrowLazyListState
+        WeatherIndex.Tomorrow to tomorrowLazyListState,
     )
 
     HomeScreenContent(
@@ -104,7 +104,7 @@ fun HomeScreen(
         },
         actionNext7Days = {
             navigateToNextSevenDay.invoke(viewModel.coordinate.value.first, viewModel.coordinate.value.second)
-        }
+        },
     )
 }
 
@@ -122,7 +122,7 @@ fun HomeScreenContent(
     actionSearch: (() -> Unit)? = null,
     onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null,
     weatherLazyListState: Map<WeatherIndex, LazyListState> = mapOf(),
-    actionNext7Days: (() -> Unit)? = null
+    actionNext7Days: (() -> Unit)? = null,
 ) {
     val drawableId = if (isSystemInDarkTheme()) R.drawable.background_night else R.drawable.background
 
@@ -130,7 +130,7 @@ fun HomeScreenContent(
         BackgroundImage(
             modifier = Modifier.fillMaxSize(),
             painter = painterResource(drawableId),
-            alignment = Alignment.TopCenter
+            alignment = Alignment.TopCenter,
         ) {
             Scaffold(
                 scaffoldState = scaffoldState,
@@ -143,33 +143,36 @@ fun HomeScreenContent(
                         openSearchView = openSearchView,
                         focusRequest = focusRequest,
                         keyboardController = keyboardController,
-                        actionSearch = actionSearch
+                        actionSearch = actionSearch,
                     )
                 },
                 modifier = modifier,
-                backgroundColor = Color.Transparent
-            ) {
-                val contentModifier = Modifier
-                    .fillMaxSize()
-                    .padding(all = 18.dp)
+                backgroundColor = Color.Transparent,
+                content = { paddingValues ->
+                    Box(modifier = Modifier.padding(paddingValues)) {
+                        val contentModifier = Modifier
+                            .fillMaxSize()
+                            .padding(all = 18.dp)
 
-                ExceptionHandleView(
-                    state = homeViewState,
-                    snackBarHostState = scaffoldState.snackbarHostState
-                ) {
-                    if (homeViewState.currentWeather != null) {
-                        CurrentWeatherContent(
-                            modifier = contentModifier,
-                            currentWeather = homeViewState.currentWeather,
-                            weatherState = homeViewState.weatherState,
-                            weatherLazyListState = weatherLazyListState,
-                            weatherIndex = homeViewState.weatherState.weatherIndex,
-                            onWeatherIndexChanged = onWeatherIndexChanged,
-                            actionNext7Days = actionNext7Days
-                        )
+                        ExceptionHandleView(
+                            state = homeViewState,
+                            snackBarHostState = scaffoldState.snackbarHostState,
+                        ) {
+                            if (homeViewState.currentWeather != null) {
+                                CurrentWeatherContent(
+                                    modifier = contentModifier,
+                                    currentWeather = homeViewState.currentWeather,
+                                    weatherState = homeViewState.weatherState,
+                                    weatherLazyListState = weatherLazyListState,
+                                    weatherIndex = homeViewState.weatherState.weatherIndex,
+                                    onWeatherIndexChanged = onWeatherIndexChanged,
+                                    actionNext7Days = actionNext7Days,
+                                )
+                            }
+                        }
                     }
-                }
-            }
+                },
+            )
         }
     }
 }
@@ -182,13 +185,13 @@ fun CurrentWeatherContent(
     weatherLazyListState: Map<WeatherIndex, LazyListState>,
     weatherIndex: WeatherIndex = WeatherIndex.Today,
     onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null,
-    actionNext7Days: (() -> Unit)? = null
+    actionNext7Days: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .padding(top = 2.dp)
-                .height(78.dp)
+                .height(78.dp),
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -196,28 +199,28 @@ fun CurrentWeatherContent(
                     modifier = Modifier,
                     style = MaterialTheme.typography.body1.copy(
                         color = MaterialTheme.colors.onPrimary,
-                        fontSize = 12.sp
-                    )
+                        fontSize = 12.sp,
+                    ),
                 )
 
                 Column(
                     modifier = Modifier
-                        .wrapContentSize(align = Alignment.BottomStart)
+                        .wrapContentSize(align = Alignment.BottomStart),
                 ) {
                     Text(
                         text = currentWeather.city,
                         style = MaterialTheme.typography.body1.copy(
                             color = MaterialTheme.colors.onPrimary,
-                            fontSize = 14.sp
-                        )
+                            fontSize = 14.sp,
+                        ),
                     )
 
                     Text(
                         text = currentWeather.country,
                         style = MaterialTheme.typography.h5.copy(
                             color = MaterialTheme.colors.onPrimary,
-                            fontSize = 24.sp
-                        )
+                            fontSize = 24.sp,
+                        ),
                     )
                 }
             }
@@ -230,16 +233,16 @@ fun CurrentWeatherContent(
                     style = MaterialTheme.typography.h4.copy(
                         color = MaterialTheme.colors.onPrimary,
                         fontSize = 62.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                        fontWeight = FontWeight.Bold,
+                    ),
                 )
 
                 Text(
                     text = stringResource(R.string.zero),
                     style = MaterialTheme.typography.h5.copy(
                         color = MaterialTheme.colors.onPrimary,
-                        fontSize = 25.sp
-                    )
+                        fontSize = 25.sp,
+                    ),
                 )
             }
         }
@@ -249,21 +252,21 @@ fun CurrentWeatherContent(
         CurrentWeatherInfo(
             modifier = Modifier.height(200.dp)
                 .fillMaxWidth(),
-            currentWeather = currentWeather
+            currentWeather = currentWeather,
         )
 
         Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
             HomeWeatherTabs(
                 modifier = Modifier.weight(1f),
                 weatherIndex = weatherIndex,
-                onWeatherIndexChanged = onWeatherIndexChanged
+                onWeatherIndexChanged = onWeatherIndexChanged,
             )
 
             TextButton(
                 onClick = {
                     actionNext7Days?.invoke()
                 },
-                modifier = Modifier.wrapContentWidth()
+                modifier = Modifier.wrapContentWidth(),
             ) {
                 Text(text = stringResource(R.string.next_7_days), color = Color.White)
 
@@ -271,17 +274,17 @@ fun CurrentWeatherContent(
                     imageVector = Icons.Filled.ArrowForwardIos,
                     contentDescription = stringResource(R.string.next_7_days),
                     modifier = Modifier.padding(start = 2.dp).width(12.dp).height(12.dp),
-                    tint = Color.White
+                    tint = Color.White,
                 )
             }
         }
 
         Box(
             modifier = Modifier
-                .height(124.dp)
+                .height(124.dp),
         ) {
-            val state by derivedStateOf {
-                weatherLazyListState.getValue(weatherIndex)
+            val state by remember(weatherIndex) {
+                derivedStateOf { weatherLazyListState.getValue(weatherIndex) }
             }
 
             LazyRow(state = state) {
@@ -297,7 +300,7 @@ fun CurrentWeatherContent(
 @Composable
 fun CurrentWeatherInfo(
     modifier: Modifier = Modifier,
-    currentWeather: CurrentWeatherViewDataModel
+    currentWeather: CurrentWeatherViewDataModel,
 ) {
     Box(modifier = modifier) {
         Image(
@@ -305,7 +308,7 @@ fun CurrentWeatherInfo(
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillBounds,
-            alpha = 0.2f
+            alpha = 0.2f,
         )
 
         Image(
@@ -315,20 +318,20 @@ fun CurrentWeatherInfo(
                     crossfade(true)
                     placeholder(R.drawable.ic_cloud)
                     error(R.drawable.ic_cloud)
-                }
+                },
             ),
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(84.dp)
+                .size(84.dp),
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight(0.5f)
-                .align(Alignment.TopStart)
+                .align(Alignment.TopStart),
         ) {
 
             Column(
@@ -336,15 +339,15 @@ fun CurrentWeatherInfo(
                     .fillMaxSize()
                     .wrapContentSize()
                     .align(Alignment.Center),
-                verticalArrangement = Arrangement.SpaceAround
+                verticalArrangement = Arrangement.SpaceAround,
             ) {
                 Text(
                     text = stringResource(R.string.humidity),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 12.sp
-                    )
+                        fontSize = 12.sp,
+                    ),
                 )
 
                 Text(
@@ -352,8 +355,8 @@ fun CurrentWeatherInfo(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 24.sp
-                    )
+                        fontSize = 24.sp,
+                    ),
                 )
             }
         }
@@ -364,29 +367,29 @@ fun CurrentWeatherInfo(
                 .fillMaxHeight(fraction = 0.2f)
                 .width(1.dp)
                 .align(Alignment.TopCenter)
-                .background(White60)
+                .background(White60),
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight(0.5f)
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopEnd),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize()
                     .align(Alignment.Center),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.wind),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 12.sp
-                    )
+                        fontSize = 12.sp,
+                    ),
                 )
 
                 Text(
@@ -394,8 +397,8 @@ fun CurrentWeatherInfo(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 24.sp
-                    )
+                        fontSize = 24.sp,
+                    ),
                 )
             }
         }
@@ -406,29 +409,29 @@ fun CurrentWeatherInfo(
                 .fillMaxHeight(fraction = 0.2f)
                 .width(1.dp)
                 .align(Alignment.BottomCenter)
-                .background(White60)
+                .background(White60),
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight(0.5f)
-                .align(Alignment.BottomStart)
+                .align(Alignment.BottomStart),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize()
                     .align(Alignment.Center),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.visibility),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 12.sp
-                    )
+                        fontSize = 12.sp,
+                    ),
                 )
 
                 Text(
@@ -436,8 +439,8 @@ fun CurrentWeatherInfo(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 24.sp
-                    )
+                        fontSize = 24.sp,
+                    ),
                 )
             }
         }
@@ -448,29 +451,29 @@ fun CurrentWeatherInfo(
                 .fillMaxWidth(fraction = 0.28f)
                 .height(1.dp)
                 .align(Alignment.CenterStart)
-                .background(White60)
+                .background(White60),
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.5f)
                 .fillMaxHeight(0.5f)
-                .align(Alignment.BottomEnd)
+                .align(Alignment.BottomEnd),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize()
                     .align(Alignment.Center),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.real_feel),
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 12.sp
-                    )
+                        fontSize = 12.sp,
+                    ),
                 )
 
                 Text(
@@ -478,8 +481,8 @@ fun CurrentWeatherInfo(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
-                        fontSize = 24.sp
-                    )
+                        fontSize = 24.sp,
+                    ),
                 )
             }
         }
@@ -490,7 +493,7 @@ fun CurrentWeatherInfo(
                 .fillMaxWidth(fraction = 0.28f)
                 .height(1.dp)
                 .align(Alignment.CenterEnd)
-                .background(White60)
+                .background(White60),
         )
     }
 }
@@ -503,7 +506,7 @@ fun HomeWeatherTabs(
     tabsContent: Array<String> = stringArrayResource(R.array.days),
     modifier: Modifier,
     weatherIndex: WeatherIndex = WeatherIndex.Today,
-    onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null
+    onWeatherIndexChanged: ((WeatherIndex) -> Unit)? = null,
 ) {
     val tabRowHeight = 6.dp
     TabRow(
@@ -513,44 +516,48 @@ fun HomeWeatherTabs(
         divider = {
             TabRowDefaults.Divider(
                 thickness = tabRowHeight,
-                color = Color.Transparent
+                color = Color.Transparent,
             )
         },
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.customTabIndicator(tabPositions[weatherIndex.value()], tabRowHeight),
                 height = tabRowHeight,
-                color = Color.White
+                color = Color.White,
             )
-        }
+        },
     ) {
         tabsContent.forEachIndexed { index, text ->
-            Tab(selected = weatherIndex.value() == index, onClick = {
-                onWeatherIndexChanged?.invoke(WeatherIndex.from(index))
-            }, text = {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.body1,
-                    color = Color.White
-                )
-            })
+            Tab(
+                selected = weatherIndex.value() == index,
+                onClick = {
+                    onWeatherIndexChanged?.invoke(WeatherIndex.from(index))
+                },
+                text = {
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.body1,
+                        color = Color.White,
+                    )
+                },
+            )
         }
     }
 }
 
 fun Modifier.customTabIndicator(
     currentTabPosition: TabPosition,
-    tabRowHeight: Dp
+    tabRowHeight: Dp,
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "tabIndicator"
         value = currentTabPosition
-    }
+    },
 ) {
     val currentTabWidth = currentTabPosition.width
     val indicatorOffset by animateDpAsState(
         targetValue = currentTabPosition.left + currentTabWidth / 2 - tabRowHeight / 2,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
     )
     fillMaxWidth()
         .wrapContentSize(Alignment.BottomStart)
@@ -573,21 +580,21 @@ private fun HomeTopAppBar(
     openSearchView: (() -> Unit)? = null,
     actionSearch: (() -> Unit)? = null,
     focusRequest: FocusRequester = remember { FocusRequester() },
-    keyboardController: SoftwareKeyboardController? = null
+    keyboardController: SoftwareKeyboardController? = null,
 ) {
     if (showSearchView) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            elevation = 8.dp
+            elevation = 8.dp,
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 IconButton(
-                    onClick = { closeSearchView?.invoke() }
+                    onClick = { closeSearchView?.invoke() },
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.close),
-                        tint = MaterialTheme.colors.primary
+                        tint = MaterialTheme.colors.primary,
                     )
                 }
 
@@ -604,22 +611,22 @@ private fun HomeTopAppBar(
                     colors = TextFieldDefaults.textFieldColors(
                         backgroundColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                        unfocusedIndicatorColor = Color.Transparent,
                     ),
                     placeholder = {
                         Text(
-                            text = stringResource(R.string.search_city)
+                            text = stringResource(R.string.search_city),
                         )
                     },
                     trailingIcon = if (searchQuery.isNotEmpty()) {
                         {
                             IconButton(
-                                onClick = { onSearchChange?.invoke("") }
+                                onClick = { onSearchChange?.invoke("") },
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Close,
                                     contentDescription = stringResource(R.string.remove),
-                                    tint = MaterialTheme.colors.primary
+                                    tint = MaterialTheme.colors.primary,
                                 )
                             }
                         }
@@ -629,8 +636,8 @@ private fun HomeTopAppBar(
                         onSearch = {
                             actionSearch?.invoke()
                             keyboardController?.hide()
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }
@@ -647,7 +654,7 @@ private fun HomeTopAppBar(
                         .fillMaxSize()
                         .padding(bottom = 4.dp, top = 12.dp),
                     style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.onPrimary),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             },
             navigationIcon = {
@@ -655,7 +662,7 @@ private fun HomeTopAppBar(
                     Icon(
                         painter = painterResource(R.drawable.ic_menu_drawer),
                         contentDescription = stringResource(R.string.menu),
-                        tint = MaterialTheme.colors.primary
+                        tint = MaterialTheme.colors.primary,
                     )
                 }
             },
@@ -664,12 +671,12 @@ private fun HomeTopAppBar(
                     Icon(
                         imageVector = Icons.Filled.Search,
                         contentDescription = stringResource(R.string.search_city),
-                        tint = MaterialTheme.colors.primary
+                        tint = MaterialTheme.colors.primary,
                     )
                 }
             },
             backgroundColor = Color.Transparent,
-            elevation = elevation
+            elevation = elevation,
         )
     }
 }
@@ -692,7 +699,7 @@ fun CurrentWeatherInfoPreview() {
         Surface {
             CurrentWeatherInfo(
                 modifier = Modifier.height(200.dp),
-                currentWeather = createCurrentWeather()
+                currentWeather = createCurrentWeather(),
             )
         }
     }
