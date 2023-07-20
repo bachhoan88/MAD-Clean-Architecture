@@ -29,6 +29,10 @@ jobs:
       - name: Check code convention
         run: ./gradlew ktlint
 
+      # Check lint
+      - name: Check lint
+        run: ./gradlew lintDevDebug
+
 #      # Run unit test
 #      - name: Run UT
 #        run: ./gradlew fullCoverageReport

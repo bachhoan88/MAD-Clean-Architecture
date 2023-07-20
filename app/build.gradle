@@ -7,7 +7,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
 }
 
-apply(from: 'ktlint.gradle')
+apply(from: "ktlint.gradle")
 
 def key = new Properties()
 def keyFile = rootProject.file('key.properties')
@@ -16,14 +16,14 @@ if (keyFile.exists()) {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.weather"
         minSdk 21
-        targetSdk 33
-        versionCode 4
-        versionName "1.0.4"
+        targetSdk 34
+        versionCode 5
+        versionName "1.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -52,18 +52,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
-        useIR = true
+        jvmTarget = '17'
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerVersion Libs.Kotlin.version
         kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
     }
     packagingOptions {
@@ -73,13 +71,9 @@ android {
     }
 
     kapt {
-        javacOptions {
-            // These options are normally set automatically via the Hilt Gradle plugin, but we
-            // set them manually to workaround a bug in the Kotlin 1.5.20
-            option("-Adagger.fastInit=ENABLED")
-            option("-Adagger.hilt.android.internal.disableAndroidSuperclassValidation=true")
-        }
+        correctErrorTypes true
     }
+    namespace 'com.example.weather'
 }
 
 dependencies {
